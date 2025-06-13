@@ -17,8 +17,16 @@ if (isset($_POST['submit'])) {
         $insert = mysqli_query($conn, "INSERT INTO `contact_form` (nama, nomor, email, penyakit, dokter, tanggal, waktu) VALUES ('$nama','$nomor','$email','$penyakit','$dokter','$tanggal','$waktu')") or die('query gagal');
 
         if ($insert) {
-            echo '<script>alert("Janji Temu Berhasil!");</script>';
+            echo '
+            <div class="popup">
+                <div class="popup-content">
+                    <p>Janji Temu Berhasil!</p>
+                    <button onclick="closePopup()">Tutup</button>
+                </div>
+            </div>
+            ';
         }
+
     }
 }
 
@@ -29,13 +37,12 @@ if (!$result_target) {
     die("Query target gagal: " . mysqli_error($conn));
 }
 
-
-$nomor = mysqli_fetch_assoc($result_target)['nomor'];
-
-
-if (!$nomor) {
-    die("Nomor telepon tidak ditemukan atau kosong");
-}
+if (empty($nomor)) {
+        echo "Nomor telepon tidak ditemukan atau kosong";
+    } else {
+        $row_target = mysqli_fetch_assoc($result_target);
+        $nomor = $row_target['nomor'];
+    }
 
 $curl = curl_init();
 
@@ -50,11 +57,11 @@ curl_setopt_array($curl, array(
     CURLOPT_CUSTOMREQUEST => 'POST',
     CURLOPT_POSTFIELDS => array(
         'target' => $nomor,
-        'message' => 'test message',
+        'message' => 'Terimakasih atas janji temu Anda dengan Medical Kit. Kami akan segera menghubungi Anda. Terima kasih!',
         'countryCode' => '62', 
     ),
     CURLOPT_HTTPHEADER => array(
-        'Authorization: rhQCdTfUezf6s3#-#mTB' 
+        'Authorization: GzJv56gBV6v6kEJ3FPG7' 
     ),
 ));
 
@@ -75,9 +82,6 @@ echo $response;
 
 mysqli_close($conn);
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -229,7 +233,7 @@ mysqli_close($conn);
 
         <div class="box">
             <img src="image/avatar.jpg" alt="">
-            <h3>Dr. Ikhsan</h3>
+            <h3>Dokter A</h3>
             <span>SPESIALIS  PSIKOLOG</span>
             <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
@@ -242,7 +246,7 @@ mysqli_close($conn);
 
         <div class="box">
             <img src="image/avatar.jpg" alt="">
-            <h3>Dr. Ageng</h3>
+            <h3>Dokter B</h3>
             <span>SPESIALIS SARAF</span>
             <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
@@ -254,7 +258,7 @@ mysqli_close($conn);
 
         <div class="box">
             <img src="image/avatar.jpg" alt="">
-            <h3>Dr. Faqih</h3>
+            <h3>Dokter C</h3>
             <span>SPESIALIS KULIT</span>
             <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
@@ -266,7 +270,7 @@ mysqli_close($conn);
 
         <div class="box">
             <img src="image/avatar.jpg" alt="">
-            <h3>Dr. Rayhan</h3>
+            <h3>Dokter D</h3>
             <span>SPESIALIS PSIKOLOG</span>
             <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
@@ -278,7 +282,7 @@ mysqli_close($conn);
 
         <div class="box">
             <img src="image/avatar.jpg" alt="">
-            <h3>Dr. Raditya</h3>
+            <h3>Dokter E</h3>
             <span>SPESIALIS SARAF</span>
             <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
@@ -290,8 +294,30 @@ mysqli_close($conn);
 
         <div class="box">
             <img src="image/avatar.jpg" alt="">
-            <h3>Dr. Siska</h3>
+            <h3>Dokter F</h3>
             <span>SPESIALIS KULIT</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+            </div>
+        </div>
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dokter G</h3>
+            <span>SPESIALIS Jantung</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+            </div>
+        </div>
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dokter H</h3>
+            <span>SPESIALIS Jantung</span>
             <div class="share">
             <a href="#" class="fab fa-facebook-f"></a>
                 <a href="#" class="fab fa-twitter"></a>
@@ -317,7 +343,7 @@ mysqli_close($conn);
             <img src="image/appointment-img.svg" alt="">
         </div>
 
-        <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post">
+        <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post" id="appointmentForm">
         <?php
             if (isset($message)) {
                 foreach ($message as $msg) {
@@ -335,10 +361,11 @@ mysqli_close($conn);
                 <option value="Psikolog">Psikolog</option>
                 <option value="Saraf">Saraf</option>
                 <option value="Kulit">Kulit</option>
+                <option value="Jantung">Jantung</option>
             </select>
             <select id="dokter" name="dokter" class="box">
                 <option value="">Pilih Spesialisasi Dahulu</option>
-            </select>
+            </select>''
             <input type="date"name="tanggal" required onchange="updateWaktuOptions()" class="box">
             <select id="waktu" name="waktu" class="box" required></select>
             <input type="submit" name="submit" value="Buat Janji Temu" class="btn">
@@ -346,12 +373,14 @@ mysqli_close($conn);
 
         <script>
         var waktuDipesan = {
-            "Dr. Ikhsan": ["09:00", "12:00"],
-            "Dr. Rayhan": ["15:00", "18:00"],
-            "Dr. Ageng": ["09:00", "15:00"],
-            "Dr. Raditya": ["12:00", "18:00"],
-            "Dr. Faqih": ["09:00", "15:00"],
-            "Dr. Siska": ["12:00", "18:00"]
+            "Dokter A": ["09:00", "12:00"],
+            "Dokter B": ["15:00", "18:00"],
+            "Dokter C": ["09:00", "15:00"],
+            "Dokter D": ["12:00", "18:00"],
+            "Dokter E": ["09:00", "15:00"],
+            "Dokter F": ["12:00", "18:00"],
+            "Dokter G": ["12:00", "18:00"],
+            "Dokter H": ["12:00", "18:00"]
         };
 
         function getDokter() {
@@ -362,9 +391,10 @@ mysqli_close($conn);
 
             var dokterByPenyakit = {
                 Pilih: ["Pilih Penyakit Dahulu"],
-                Psikolog: ["Dr. Ikhsan", "Dr. Rayhan"],
-                Saraf: ["Dr. Ageng", "Dr. Raditya"],
-                Kulit: ["Dr. Faqih", "Dr. Siska"],
+                Psikolog: ["Dokter A", "Dokter B"],
+                Saraf: ["Dokter C", "Dokter D"],
+                Kulit: ["Dokter E", "Dokter F"],
+                Jantung: ["Dokter G", "Dokter H"]
             };
 
             dokterByPenyakit[selectedPenyakit].forEach(dokter => {
@@ -517,6 +547,17 @@ mysqli_close($conn);
 <!-- js file link  -->
 <script src="js/script.js"></script>
 
+<script>
+function closePopup() {
+  document.querySelector('.popup').remove();
+}
+
+setTimeout(() => {
+  const popup = document.querySelector('.popup');
+  if (popup) popup.remove();
+}, 3000); // 3000 ms = 3 detik
+
+</script>
 </body>
 </html>
 
