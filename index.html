@@ -1,0 +1,522 @@
+<?php
+$conn = mysqli_connect('localhost', 'root', '', 'contact_db') or die('koneksi gagal');
+$message = array();
+
+if (isset($_POST['submit'])) {
+    $nama = mysqli_real_escape_string($conn, $_POST['nama']);
+    $nomor = $_POST['nomor'];
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $penyakit = $_POST['penyakit'];
+    $dokter = $_POST['dokter'];
+    $tanggal = $_POST['tanggal'];
+    $waktu = $_POST['waktu'];
+
+    if (empty($nama) || empty($nomor) || empty($email) || $penyakit == 'Pilih' || empty($dokter) || empty($tanggal) || empty($waktu)) {
+        echo '<script>alert("Janji Temu Gagal! \nMohon lengkapi semua kolom!");</script>';
+    } else {
+        $insert = mysqli_query($conn, "INSERT INTO `contact_form` (nama, nomor, email, penyakit, dokter, tanggal, waktu) VALUES ('$nama','$nomor','$email','$penyakit','$dokter','$tanggal','$waktu')") or die('query gagal');
+
+        if ($insert) {
+            echo '<script>alert("Janji Temu Berhasil!");</script>';
+        }
+    }
+}
+
+$query_target = "SELECT nomor FROM contact_form ORDER BY id DESC LIMIT 1";
+$result_target = mysqli_query($conn, $query_target);
+
+if (!$result_target) {
+    die("Query target gagal: " . mysqli_error($conn));
+}
+
+
+$nomor = mysqli_fetch_assoc($result_target)['nomor'];
+
+
+if (!$nomor) {
+    die("Nomor telepon tidak ditemukan atau kosong");
+}
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+    CURLOPT_URL => 'https://api.fonnte.com/send',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'POST',
+    CURLOPT_POSTFIELDS => array(
+        'target' => $nomor,
+        'message' => 'test message',
+        'countryCode' => '62', 
+    ),
+    CURLOPT_HTTPHEADER => array(
+        'Authorization: rhQCdTfUezf6s3#-#mTB' 
+    ),
+));
+
+$response = curl_exec($curl);
+
+if (curl_errno($curl)) {
+    $error_msg = curl_error($curl);
+}
+
+curl_close($curl);
+
+if (isset($error_msg)) {
+    echo $error_msg;
+}
+
+echo $response;
+
+
+mysqli_close($conn);
+?>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Kit</title>
+
+    <!-- font awesome cdn link  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/index.css">
+
+</head>
+<body>
+    
+<!-- header section starts  -->
+
+<header class="header">
+
+    <a href="#" class="logo"> <i class="fas fa-heartbeat"></i> <strong>MEDICAL</strong> KIT </a>
+
+    <nav class="navbar">
+        <a href="#home">beranda</a>
+        <a href="#about">tentang kami</a>
+        <a href="#services">layanan</a>
+        <a href="#doctors">dokter</a>
+        <a href="#appointment">janji temu</a>
+        <a href="#blogs">artikel</a>
+    </nav>
+
+    <div id="menu-btn" class="fas fa-bars"></div>
+
+</header>
+
+<!-- header section ends -->
+
+<!-- home section starts  -->
+
+<section class="home" id="home">
+
+    <div class="image">
+        <img src="image/home-img.svg"    alt="">
+    </div>
+
+    <div class="content">
+        <h3>"Karena Kebutuhan Anda Prioritas Kami"</h3>
+        <p> Kami hadir memberikan pelayanan kesehatan terbaik dengan memprioritaskan kebutuhan pasien dan keluarga. 
+            Dengan layanan kesehatan berbasis Value Based Care yang didukung teknologi, 
+            edukasi dan riset sehingga dapat memberikan pengalaman terbaik bagi pasien.</p>
+        <a href="#appointment" class="btn"> buat janji temu <span class="fas fa-chevron-right"></span> </a>
+    </div>
+
+</section>
+
+<!-- home section ends -->
+
+<!-- about section starts  -->
+
+<section class="about" id="about">
+
+    <h1 class="heading"> <span>tentang</span> kami </h1>
+
+    <div class="row">
+
+        <div class="image">
+            <img src="image/about-img.svg" alt="">
+        </div>
+
+        <div class="content">
+            <h3>Selamat datang di Rumah Sakit Medical Kit!</h3>
+            <p>Kami adalah pusat pelayanan kesehatan yang berkomitmen untuk memberikan perawatan berkualitas tinggi dan layanan yang peduli kepada setiap pasien. Dengan tim medis yang berdedikasi, fasilitas modern, dan pendekatan holistik terhadap kesehatan, kami berupaya menjadi mitra terpercaya dalam perjalanan Anda menuju kesehatan optimal. Kami mengutamakan keamanan, keamanan, dan kenyamanan pasien kami, serta berkomitmen untuk terus meningkatkan standar layanan kami. Terima kasih telah memilih Rumah Sakit Medical Kit sebagai pilihan kesehatan Anda.</p>
+            <p>Pemeriksaan Kesehatan Secara Teratur Dan Tindakan Pencegahan Juga Memainkan Peran Penting Dalam Menjaga Kesehatan Secara Keseluruhan. Memprioritaskan Pendekatan Yang Seimbang Dan Holistik Terhadap Kesejahteraan Adalah Hal Penting Untuk Mencapai Dan Mempertahankan Hidup Sehat.</p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- about section ends -->
+
+<!-- services section starts  -->
+
+<section class="services" id="services">
+
+    <h1 class="heading"> layanan <span>kami</span> </h1>
+
+    <div class="box-container">
+
+        <div class="box">
+            <i class="fas fa-notes-medical"></i>
+            <h3>Pemeriksaan Gratis</h3>
+            <p>Nikmati pemeriksaan kesehatan gratis kami sebagai langkah awal untuk merawat kesejahteraan Anda.
+            Segera jadwalkan kunjungan Anda ke Rumah Sakit MEDICAL KIT dan dapatkan pelayanan berkualitas
+            tanpa biaya.</p>
+        </div>
+
+        <div class="box">
+            <i class="fas fa-ambulance"></i>
+            <h3>24/7 ambulans</h3>
+            <p>Layanan ambulans kami siap 24/7 untuk memberikan bantuan cepat dan tepat dalam situasi darurat.
+            Keamanan dan kesejahteraan Anda adalah prioritas utama kami.</p>
+        </div>
+
+        <div class="box">
+            <i class="fas fa-user-md"></i>
+            <h3>dokter ahli</h3>
+            <p>Tim dokter ahli kami siap memberikan perawatan kesehatan terbaik untuk Anda. 
+                Kepercayaan Anda adalah prioritas kami di Rumah Sakit MEDICAL KIT.</p>
+        </div>
+
+        <div class="box">
+            <i class="fas fa-pills"></i>
+            <h3>Obat</h3>
+            <p>Temukan obat berkualitas tinggi di layanan farmasi kami untuk kebutuhan kesehatan Anda.
+                Rumah Sakit MEDICAL KIT siap memberikan penanganan terbaik.</p>
+        </div>
+
+        <div class="box">
+            <i class="fas fa-procedures"></i>
+            <h3>Fasilitas Tempat Tidur</h3>
+            <p>Rumah Sakit MEDICAL KIT menyediakan fasilitas tempat tidur modern untuk kenyamanan dan pemulihan pasien</p>
+        </div>
+
+        <div class="box">
+            <i class="fas fa-heartbeat"></i>
+            <h3>Perawatan Total</h3>
+            <p>Kami menyediakan perawatan total yang holistik untuk memenuhi kebutuhan kesehatan Anda.
+                Percayakan perjalanan kesehatan Anda kepada kami di Rumah Sakit MEDICAL KIT.</p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- services section ends -->
+
+
+
+<!-- doctors section starts  -->
+
+<section class="doctors" id="doctors">
+
+    <h1 class="heading"> Dokter <span>Kami</span> </h1>
+
+    <div class="box-container">
+
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dr. Ikhsan</h3>
+            <span>SPESIALIS  PSIKOLOG</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+                
+            </div>
+        </div>
+
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dr. Ageng</h3>
+            <span>SPESIALIS SARAF</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+            </div>
+        </div>
+
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dr. Faqih</h3>
+            <span>SPESIALIS KULIT</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+            </div>
+        </div>
+
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dr. Rayhan</h3>
+            <span>SPESIALIS PSIKOLOG</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+            </div>
+        </div>
+
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dr. Raditya</h3>
+            <span>SPESIALIS SARAF</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+            </div>
+        </div>
+
+        <div class="box">
+            <img src="image/avatar.jpg" alt="">
+            <h3>Dr. Siska</h3>
+            <span>SPESIALIS KULIT</span>
+            <div class="share">
+            <a href="#" class="fab fa-facebook-f"></a>
+                <a href="#" class="fab fa-twitter"></a>
+                <a href="#" class="fab fa-instagram"></a>
+                <a href="#" class="fab fa-linkedin"></a>
+            </div>
+        </div>
+
+
+</section>
+
+<!-- doctors section ends -->
+
+<!-- appointmenting section starts   -->
+
+<section class="appointment" id="appointment">
+
+    <h1 class="heading"> <span>janji temu</span> dokter </h1>    
+
+    <div class="row">
+
+        <div class="image">
+            <img src="image/appointment-img.svg" alt="">
+        </div>
+
+        <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post">
+        <?php
+            if (isset($message)) {
+                foreach ($message as $msg) {
+                    echo 'alert("' . $msg . '");';
+                }
+            }
+        ?>
+
+            <h3>Buat Janji Temu</h3>
+            <input type="text"name="nama" placeholder="Nama" class="box">
+            <input type="text"name="nomor" placeholder="No. Handphone" class="box">
+            <input type="email"name="email" placeholder="Email" class="box">
+            <select id="penyakit" name="penyakit" class="box" onchange="getDokter()">
+                <option value="Pilih">Silahkan Pilih Spesialisasi</option>
+                <option value="Psikolog">Psikolog</option>
+                <option value="Saraf">Saraf</option>
+                <option value="Kulit">Kulit</option>
+            </select>
+            <select id="dokter" name="dokter" class="box">
+                <option value="">Pilih Spesialisasi Dahulu</option>
+            </select>
+            <input type="date"name="tanggal" required onchange="updateWaktuOptions()" class="box">
+            <select id="waktu" name="waktu" class="box" required></select>
+            <input type="submit" name="submit" value="Buat Janji Temu" class="btn">
+        </form>
+
+        <script>
+        var waktuDipesan = {
+            "Dr. Ikhsan": ["09:00", "12:00"],
+            "Dr. Rayhan": ["15:00", "18:00"],
+            "Dr. Ageng": ["09:00", "15:00"],
+            "Dr. Raditya": ["12:00", "18:00"],
+            "Dr. Faqih": ["09:00", "15:00"],
+            "Dr. Siska": ["12:00", "18:00"]
+        };
+
+        function getDokter() {
+            var selectedPenyakit = document.getElementById("penyakit").value;
+            var dokterDropdown = document.getElementById("dokter");
+
+            dokterDropdown.innerHTML = "";
+
+            var dokterByPenyakit = {
+                Pilih: ["Pilih Penyakit Dahulu"],
+                Psikolog: ["Dr. Ikhsan", "Dr. Rayhan"],
+                Saraf: ["Dr. Ageng", "Dr. Raditya"],
+                Kulit: ["Dr. Faqih", "Dr. Siska"],
+            };
+
+            dokterByPenyakit[selectedPenyakit].forEach(dokter => {
+                var option = document.createElement("option");
+                option.text = dokter;
+                dokterDropdown.appendChild(option);
+            });
+        }
+
+        function updateWaktuOptions() {
+            var availableTimes = ["09:00", "12:00", "15:00", "18:00"];
+            var selectedDokter = document.getElementById("dokter").value;
+            var waktuSelect = document.getElementById("waktu");
+
+            waktuSelect.innerHTML = '';
+
+            var waktuDokterDipesan = waktuDipesan[selectedDokter] || [];
+
+            for (var i = 0; i < availableTimes.length; i++) {
+                if (!waktuDokterDipesan.includes(availableTimes[i])) {
+                    var option = document.createElement("option");
+                    option.value = availableTimes[i];
+                    option.text = availableTimes[i];
+                    waktuSelect.appendChild(option);
+                }
+            }
+        }
+    </script>
+
+    </div>
+
+</section>
+
+<!-- appointmenting section ends -->
+
+
+<!-- blogs section starts  -->
+
+<section class="blogs" id="blogs">
+
+    <h1 class="heading"> artikel <span>terbaru</span> </h1>
+
+    <div class="box-container">
+
+        <div class="box">
+            <div class="image">
+                <img src="image/a1.jpg" alt="">
+            </div>
+            <div class="content">
+                <div class="icon">
+                    <a href=""> <i class="fas fa-calendar"></i> 19 Januari 2024 </a>
+                    <a href=""> <i class="fas fa-user"></i> by halodoc </a>
+                </div>
+                <h3>Cegah Iritasi dan Kemerahan, Ini 7 Produk Skincare untuk Kulit Sensitif</h3>
+                <p>Pemilik kulit sensitif tak boleh sembarang memakai skincare karena rentan terhadap iritasi, dan reaksi alergi. 
+                    Berikut rekomendasi skincare untuk kamu yang punya kulit sensitif.</p>
+                <a href="https://www.halodoc.com/artikel/cegah-iritasi-dan-kemerahan-ini-7-produk-skincare-untuk-kulit-sensitif" class="btn">Baca Selengkapnya <span class="fas fa-chevron-right"></span></a>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="image">
+                <img src="image/a2.jpg" alt="">
+            </div>
+            <div class="content">
+                <div class="icon">
+                    <a href="#"> <i class="fas fa-calendar"></i> 18 Januari 2024 </a>
+                    <a href="#"> <i class="fas fa-user"></i> by Halodoc </a>
+                </div>
+                <h3>10 Teknik Relaksasi untuk Membantu Meredakan Stres</h3>
+                <p>Stres dapat menimbulkan masalah kesehatan fisik dan mental pada pengidapnya. 
+                    Beberapa langkah mengatasinya dengan teknik relaksasi, seperti pernapasan dan meditasi.</p>
+                <a href="https://www.halodoc.com/artikel/10-teknik-relaksasi-untuk-membantu-meredakan-stres" class="btn">Baca Selengkapnya <span class="fas fa-chevron-right"></span></a>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="image">
+                <img src="image/a3.jpg" alt="">
+            </div>
+            <div class="content">
+                <div class="icon">
+                    <a href="#"> <i class="fas fa-calendar"></i> 19 Januari 2024</a>
+                    <a href="#"> <i class="fas fa-user"></i> by Halodoc</a>
+                </div>
+                <h3>Ini 5 Cara Sederhana Menjaga Kesehatan Jantung</h3>
+                <p>Ada berbagai upaya yang bisa kamu lakukan untuk menjaga kesehatan jantung. 
+                    Contohnya dengan rajin berjalan kaki, tidak konsumsi garam berlebihan, tidur yang cukup, dan jauhi diri dari asap rokok.</p>
+                <a href="https://www.halodoc.com/artikel/ini-5-cara-sederhana-menjaga-kesehatan-jantung" class="btn">Baca Selengkapnya <span class="fas fa-chevron-right"></span></a>
+            </div>
+       
+        </div>
+
+    </div>
+
+</section>
+
+<!-- blogs section ends -->
+
+<!-- footer section starts  -->
+
+<section class="footer">
+
+    <div class="box-container">
+
+        <div class="box">
+            <h3>quick links</h3>
+            <a href="#home"> <i class="fas fa-chevron-right"></i> beranda </a>
+            <a href="#about"> <i class="fas fa-chevron-right"></i> tentang kami </a>
+            <a href="#services"> <i class="fas fa-chevron-right"></i> layanan kami </a>
+            <a href="#doctors"> <i class="fas fa-chevron-right"></i> dokter </a>
+            <a href="#appointment"> <i class="fas fa-chevron-right"></i> janji temu dokter</a>
+            <a href="#blogs"> <i class="fas fa-chevron-right"></i> blog </a>
+        </div>
+
+        <div class="box">
+            <h3>layanan kami</h3>
+            <a href="#"> <i class="fas fa-chevron-right"></i> pemeriksaan gratis </a>
+            <a href="#"> <i class="fas fa-chevron-right"></i> 24/7 ambulans </a>
+            <a href="#"> <i class="fas fa-chevron-right"></i> dokter ahli </a>
+            <a href="#"> <i class="fas fa-chevron-right"></i> obat </a>
+            <a href="#"> <i class="fas fa-chevron-right"></i> fasilitas tempat tidur </a>
+            <a href="#"> <i class="fas fa-chevron-right"></i> peralatan total </a>
+        </div>
+
+        <div class="box">
+            <h3>janji temu dokter</h3>
+            <a href="#appointment"> <i class="fas fa-phone"></i> +62 349540824 </a>
+            <a href="#"> <i class="fas fa-envelope"></i> medicalkit@gmail.com </a>
+            <a href="#"> <i class="fas fa-map-marker-alt"></i> indonesia </a>
+        </div>
+
+        <div class="box">
+            <h3>Hubungi Kami</h3>
+            <a href="#"> <i class="fab fa-facebook"></i> facebook </a>
+            <a href="#"> <i class="fab fa-twitter"></i> twitter </a>
+            <a href="#"> <i class="fab fa-instagram"></i> instagram </a>
+            <a href="#"> <i class="fab fa-linkedin"></i> linkedin </a>
+        </div>
+
+    </div>
+
+    <div class="credit"> © 2023 <span>Medical Kit</span> | all rights reserved </div>
+
+</section>
+
+<!-- footer section ends -->
+
+
+<!-- js file link  -->
+<script src="js/script.js"></script>
+
+</body>
+</html>
+
