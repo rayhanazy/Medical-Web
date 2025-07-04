@@ -44,4 +44,3 @@ if (empty($nama) || empty($nomor) || empty($email) || $penyakit == 'Pilih' || em
 }
 
 mysqli_close($conn);
-?>
