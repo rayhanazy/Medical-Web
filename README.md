@@ -56,15 +56,15 @@ Medical-Web/
 
 ## 🚀 How to Run This Project Locally
 ```
-1. **Clone this repository**
+1. Clone this repository
 
 git clone https://github.com/rayhanazy/Medical-Web.git
 
-2. **Navigate into the project directory**
+2. Navigate into the project directory
 
 cd Medical-Web
 
-3. **Open in browser**
+3. Open in browser
 
 - Double-click on index.html
 OR
